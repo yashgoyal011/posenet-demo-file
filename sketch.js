@@ -1,11 +1,7 @@
 let capture;
 let posenet;
-let noseX, noseY;
-let reyeX, reyeY;
-let leyeX, leyeY;
-let singlepose,skeleton;
-let actor_img;
-let specs,smoke;
+let singlepose, skeleton;
+let actor_img, specs, smoke;
 
 function setup() {
     createCanvas(600, 600);
@@ -13,60 +9,50 @@ function setup() {
     capture.hide();
 
     posenet = ml5.poseNet(capture, modelLoaded);
-    posenet.on('pose', recivedload);
+    posenet.on('pose', receivedPose);
 
-   
     actor_img = loadImage('images/shahrukh.png');
     specs = loadImage('images/spects.png');
     smoke = loadImage('images/cigar.png');
 }
-function recivedload(poses) {
-    console.log(poses);
 
+function receivedPose(poses) {
+    console.log(poses);
     if (poses.length > 0) {
         skeleton = poses[0].skeleton;
         singlepose = poses[0].pose;
- 
+    }
 }
-}
+
 function modelLoaded() {
-    console.log('Model as Loaded');
+    console.log('PoseNet Model Loaded');
 }
 
 function draw() {
     image(capture, 0, 0);
-    fill(255);
+
     if (singlepose) {
         for (let i = 0; i < singlepose.keypoints.length; i++) {
-            ellipse(singlepose.keypoints[i].position.x, singlepose.keypoints[i].position.y, 20);
+            let x = singlepose.keypoints[i].position.x;
+            let y = singlepose.keypoints[i].position.y;
+            fill(255, 0, 0);
+            ellipse(x, y, 20);
         }
+
+        // Draw skeleton
         stroke(255, 255, 0);
         strokeWeight(5);
         for (let j = 0; j < skeleton.length; j++) {
             line(skeleton[j][0].position.x, skeleton[j][0].position.y, skeleton[j][1].position.x, skeleton[j][1].position.y);
         }
-        
+
+        // Draw specs on eyes
+        let reye = singlepose.rightEye;
+        let leye = singlepose.leftEye;
+        image(specs, leye.x - 50, leye.y - 50, 100, 50); // Adjust specs size
+
+        // Draw smoke on nose
+        let nose = singlepose.nose;
+        image(smoke, nose.x - 30, nose.y, 50, 50); // Adjust smoke size
     }
 }
-//     }
-//     // ellipse(noseX, noseY, 30);
-//     // ellipse(ryeX, ryeY, 30);
-//     // ellipse(lyeX, lyeY, 30);
-//     // background(200);
-//     // image(shahrukh_img,100,100,100,100);
-//     // image(shahrukh_img,mouseX,mouseY,100,100);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
